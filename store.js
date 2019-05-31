@@ -7,10 +7,8 @@ module.exports = {
 }
 
 async function createUser ({username, password}) {
-    console.log(`Received request to save user ${username} ${password}.`);
-    
+    console.log(`Creating user ${username}.`);
     const {hash, salt} = await saltHashPassword(password);
-
     return knex('user').insert({
         salt,
         encrypted_password: hash,
@@ -19,21 +17,11 @@ async function createUser ({username, password}) {
 }
 
 async function authenticate ({username, password}) {
-    console.log(`Authenticating ${username}`);
+    console.log(`Authenticating ${username}.`);
     const [user] = await knex('user').where({username});
-
     if (!user) {
         throw (new Error('User not found'));
     }
-
-    console.log(user);
-    console.log(user.encrypted_password);
-
-    const match = await comparePassword(password, user.encrypted_password);
-
-    if (!match) {
-        throw (new Error('Incorrect password'));
-    }
-
-    return match;
+    const passwordMatches = await comparePassword(password, user.encrypted_password);
+    return passwordMatches ? new Error('Incorrect password') : true;
 }

@@ -8,10 +8,7 @@ module.exports = [
 function comparePassword (password, hash) {
     return new Promise((resolve, reject) => {
         bcrypt.compare(password, hash, (err, match) => {
-            if (err) {
-                return reject(err);
-            }
-            return resolve(match);
+            return err ? reject(err) : resolve(match);
         })
     })
 }
@@ -24,11 +21,7 @@ function saltHashPassword (password) {
             }
     
             bcrypt.hash(password, salt, (err, hash) => {
-                if(err) {
-                    return reject(err);
-                }
-    
-                return resolve({hash, salt});
+                return err ? reject(err) : resolve({ hash, salt });
             })
         })
     })   
