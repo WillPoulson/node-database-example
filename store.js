@@ -1,8 +1,7 @@
 const knex = require('knex')(require('./knexfile'));
-const bcrypt = require('bcrypt');
+const { saltHashPassword, comparePassword } = require('./encryption');
 
 module.exports = {
-    saltHashPassword,
     createUser,
     authenticate
 }
@@ -37,33 +36,4 @@ async function authenticate ({username, password}) {
     }
 
     return match;
-}
-
-function comparePassword (password, hash) {
-    return new Promise((resolve, reject) => {
-        bcrypt.compare(password, hash, (err, match) => {
-            if (err) {
-                return reject(err);
-            }
-            return resolve(match);
-        })
-    })
-}
-
-function saltHashPassword (password) {
-    return new Promise((resolve, reject) => {
-        bcrypt.genSalt(10, (err, salt) => {
-            if (err) {
-                return reject(err);
-            }
-    
-            bcrypt.hash(password, salt, (err, hash) => {
-                if(err) {
-                    return reject(err);
-                }
-    
-                return resolve({hash, salt});
-            })
-        })
-    })   
 }
