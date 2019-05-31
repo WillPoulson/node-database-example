@@ -1,0 +1,11 @@
+{
+  "name": "example-node-database",
+  "version": "1.0.0",
+  "description": "An example node application to interact with a MySql database",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Will Poulson",
+  "license": "ISC"
+}
