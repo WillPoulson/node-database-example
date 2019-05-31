@@ -10,6 +10,11 @@ router.post('/createUser', [
         .exists().withMessage('Password is required')
         .isLength({min: 5}).withMessage('Password must be atleast 5 chars')
 ], (req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() })
+    }
+
     store.createUser({
         username: req.body.username,
         password: req.body.password
