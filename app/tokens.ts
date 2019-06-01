@@ -8,7 +8,7 @@ export function generateToken(username: string): string {
     );
 }
 
-function verifyToken(token: string): Promise<string | object> {
+export function verifyToken(token: string): Promise<string | object> {
     return new Promise((resolve, reject) => {
         jwt.verify(token, config.secret, (err, decoded) => {
             return err ? reject(err) : resolve(decoded);

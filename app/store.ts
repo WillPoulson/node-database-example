@@ -1,8 +1,10 @@
+import { saltHashPassword, comparePassword } from './encryption';
+import { generateToken } from './tokens';
+
 import Knex from 'knex';
 import { knexConfig } from './config';
 const knex: Knex = Knex(knexConfig);
 
-import { saltHashPassword, comparePassword } from './encryption';
 
 export interface authDetails {
     username: string;
@@ -26,5 +28,10 @@ export async function authenticate (details: authDetails) {
         throw (new Error('User not found'));
     }
     const passwordMatches = await comparePassword(details.password, user.encrypted_password);
-    return passwordMatches ? new Error('Incorrect password') : true;
+
+    if(!passwordMatches) {
+        throw new Error('Incorrect password');
+    }
+
+    return generateToken(details.username);
 }

@@ -42,8 +42,10 @@ router.post('/authenticate', [
     store.authenticate({
         username: req.body.username,
         password: req.body.password
-    }).then(() => {
-        return res.sendStatus(200);
+    }).then((token) => {
+        return res.json({
+            token
+        }).sendStatus(200);
     }).catch((error: Error) => {
         if(error.message = 'Incorrect password' || error.message == 'User not found') {
             return res.send('Incorrect username or password').status(404);
