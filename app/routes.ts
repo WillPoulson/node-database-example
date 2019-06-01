@@ -1,7 +1,8 @@
-var router = require('express').Router();
+import { Router, Request, Response } from 'express';
+import { check, validationResult } from'express-validator/check';
+import * as store from './store';
 
-const { check, validationResult } = require('express-validator/check');
-const store = require('./store');
+const router = Router();
 
 router.post('/createUser', [
     check('username')
@@ -9,7 +10,7 @@ router.post('/createUser', [
     check('password')
         .exists().withMessage('Password is required')
         .isLength({min: 5}).withMessage('Password must be atleast 5 chars')
-], (req, res) => {
+], (req: Request, res: Response) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() })
@@ -20,7 +21,7 @@ router.post('/createUser', [
         password: req.body.password
     }).then(() => {
         res.sendStatus(200);
-    }).catch((error) => {
+    }).catch((error: Error) => {
         console.log(error);
         res.sendStatus(500);
     })
@@ -32,7 +33,7 @@ router.post('/authenticate', [
     check('password')
         .exists().withMessage('Password is required')
         .isLength({min: 5}).withMessage('Password must be atleast 5 chars')
-], (req, res) => {
+], (req: Request, res: Response) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() })
@@ -43,8 +44,8 @@ router.post('/authenticate', [
         password: req.body.password
     }).then(() => {
         return res.sendStatus(200);
-    }).catch((error) => {
-        if(error = 'Incorrect password' || error == 'User not found') {
+    }).catch((error: Error) => {
+        if(error.message = 'Incorrect password' || error.message == 'User not found') {
             return res.send('Incorrect username or password').status(404);
         } else {
             console.log(error);
@@ -53,4 +54,4 @@ router.post('/authenticate', [
     })
 })
 
-module.exports = router;
+export = router;
