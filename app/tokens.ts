@@ -36,7 +36,6 @@ export function validToken(req: AuthRequest, res: Response, next: any) {
         }
         next()
     }).catch((err) => {
-        console.log(err);
         return res.status(403).json({ error: 'Invalid auth token!' });
     })  
 }

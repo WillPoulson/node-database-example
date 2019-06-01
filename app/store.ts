@@ -23,17 +23,31 @@ export async function createUser (details: authDetails) {
 
 export async function authenticate (details: authDetails) {
     console.log(`Authenticating ${details.username}.`);
-    const [user] = await knex('user').where({username: details.username});
 
-    if (!user) {
-        throw (new Error('User not found'));
+    try {
+        const user = await getUser(details.username);
+        const passwordMatches = await comparePassword(details.password, user.encrypted_password);
+
+        if(!passwordMatches) {
+            const incorrectError = new Error('Incorrect password');
+            incorrectError.name = 'incorrect-password';
+            throw incorrectError;
+        }    
+    } catch(error) {
+        throw error;
     }
-
-    const passwordMatches = await comparePassword(details.password, user.encrypted_password);
-
-    if(!passwordMatches) {
-        throw new Error('Incorrect password');
-    }
-
+    
     return generateToken(details.username);
+}
+
+export async function getUser(username: string) {
+    const [user] = await knex('user').where({username: username});
+    
+    if (!user) {
+        const notFoundError = new Error('User not found');
+        notFoundError.name = 'user-not-found';
+        throw notFoundError;
+    }
+
+    return user;
 }

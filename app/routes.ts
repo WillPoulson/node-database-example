@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { check, validationResult } from'express-validator/check';
 import { validToken, AuthRequest } from './tokens';
 import * as store from './store';
+import _ from 'lodash';
 
 const router = Router();
 
@@ -48,7 +49,7 @@ router.post('/authenticate', [
             token
         }).sendStatus(200);
     }).catch((error: Error) => {
-        if(error.message == 'Incorrect password' || error.message == 'User not found') {
+        if(error.name === 'incorrect-password' || error.name === 'user-not-found') {
             return res.send('Incorrect username or password').status(404);
         } else {
             console.log(error);
@@ -60,9 +61,17 @@ router.post('/authenticate', [
 router.get('/me', [
     validToken
 ],(req: AuthRequest, res: Response) => {
-    console.log(`Hello`);
-    console.log(req.auth);
-    return res.json(req.auth).sendStatus(200);
+    store.getUser(req.auth.username).then((user) => {
+        user = _.omit(user, ['salt', 'encrypted_password']);
+        return res.send(user).sendStatus(200);
+    }).catch((error) => {
+        if(error.name === 'user-not-found') {
+            return res.send('User not found').status(404);
+        } else {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+    })
 });
 
 export = router;
