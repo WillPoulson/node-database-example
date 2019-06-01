@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { check, validationResult } from'express-validator/check';
+import { validToken, AuthRequest } from './tokens';
 import * as store from './store';
 
 const router = Router();
@@ -25,7 +26,7 @@ router.post('/createUser', [
         console.log(error);
         res.sendStatus(500);
     })
-})
+});
 
 router.post('/authenticate', [
     check('username')
@@ -47,13 +48,21 @@ router.post('/authenticate', [
             token
         }).sendStatus(200);
     }).catch((error: Error) => {
-        if(error.message = 'Incorrect password' || error.message == 'User not found') {
+        if(error.message == 'Incorrect password' || error.message == 'User not found') {
             return res.send('Incorrect username or password').status(404);
         } else {
             console.log(error);
             return res.sendStatus(500);
         }
     })
-})
+});
+
+router.get('/me', [
+    validToken
+],(req: AuthRequest, res: Response) => {
+    console.log(`Hello`);
+    console.log(req.auth);
+    return res.json(req.auth).sendStatus(200);
+});
 
 export = router;

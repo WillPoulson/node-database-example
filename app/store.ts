@@ -24,9 +24,11 @@ export async function createUser (details: authDetails) {
 export async function authenticate (details: authDetails) {
     console.log(`Authenticating ${details.username}.`);
     const [user] = await knex('user').where({username: details.username});
+
     if (!user) {
         throw (new Error('User not found'));
     }
+
     const passwordMatches = await comparePassword(details.password, user.encrypted_password);
 
     if(!passwordMatches) {
